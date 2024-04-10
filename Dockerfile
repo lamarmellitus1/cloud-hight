@@ -1,11 +1,13 @@
-FROM maven:3-openjdk-11 AS build
-RUN mkdir -p /usr/src/app/
-WORKDIR /usr/src/app/
-COPY . .
-RUN mvn clean package -DskipTests
+FROM openjdk:11 AS BUILD_IMAGE
+RUN apt update && apt install maven -y
+RUN git clone https://github.com/lamarmellitus1/cloud-hight.git
+RUN cd vprofile-project && git checkout docker && mvn install
 
-FROM openjdk:11-jdk
-COPY --from=build /usr/src/app/target/spring-petclinic-2.4.2.jar /spring-petclinic.jar
+FROM tomcat:9-jre11
+
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+COPY --from=BUILD_IMAGE vprofile-project/target/vprofile-v2.war /usr/local/tomcat/webapps/ROOT.war
+
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "-Xmx5128M", "/spring-petclinic.jar"]
-
+CMD ["catalina.sh", "run"]
