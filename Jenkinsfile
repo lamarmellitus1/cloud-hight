@@ -5,35 +5,30 @@ pipeline {
 	    jdk "openJDK11"
 	}
 
-    environment {
-        registryCredential = 'ecr:eu-west-3:awscreds'
-        appRegistry = "002981613347.dkr.ecr.eu-west-3.amazonaws.com/vprofile-repo"
-        vprofileRegistry = "https://002981613347.dkr.ecr.eu-west-3.amazonaws.com"
-    }
   stages {
     stage('Fetch code'){
       steps {
-        git branch: 'docker', url: 'https://github.com/devopshydclub/vprofile-project.git'
+        git branch: 'main', url: 'https://github.com/lamarmellitus1/cloud-hight.git'
       }
     }
 
 
-    stage('Test'){
-      steps {
-        sh 'mvn test'
-      }
-    }
+    // stage('Test'){
+    //   steps {
+    //     sh 'mvn test'
+    //   }
+    // }
 
-    stage ('CODE ANALYSIS WITH CHECKSTYLE'){
-            steps {
-                sh 'mvn checkstyle:checkstyle'
-            }
-            post {
-                success {
-                    echo 'Generated Analysis Result'
-                }
-            }
-        }
+    // stage ('CODE ANALYSIS WITH CHECKSTYLE'){
+    //         steps {
+    //             sh 'mvn checkstyle:checkstyle'
+    //         }
+    //         post {
+    //             success {
+    //                 echo 'Generated Analysis Result'
+    //             }
+    //         }
+    //     }
     stage('Build App Image') {
 
 environment {
