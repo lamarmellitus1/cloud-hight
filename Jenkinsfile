@@ -11,7 +11,17 @@ pipeline {
         git branch: 'main', url: 'https://github.com/lamarmellitus1/cloud-hight.git'
       }
     }
-
+stage('Assume IAM Role') {
+            steps {
+                script {
+                    sh 'aws sts assume-role --role-arn arn:aws:iam::851725214577:role/cloudhightECR --role-session-name JenkinsAssumeRole > sts.json'
+                    def stsOutput = readJSON file: 'sts.json'
+                    env.AWS_ACCESS_KEY_ID = stsOutput.Credentials.AccessKeyId
+                    env.AWS_SECRET_ACCESS_KEY = stsOutput.Credentials.SecretAccessKey
+                    env.AWS_SESSION_TOKEN = stsOutput.Credentials.SessionToken
+                }
+            }
+        }
 
     // stage('Test'){
     //   steps {
@@ -36,7 +46,7 @@ environment {
             NAME = "cloudhight"
                  }
        steps {
-                withAWS(region: 'eu-west-1', role: 'arn:aws:iam::851725214577:role/cloudhightECR') {
+                withAWS(region: 'eu-west-3', role: 'arn:aws:iam::851725214577:role/cloudhightECR') {
                                 sh "aws ecr describe-repositories --repository-names ${NAME} || aws ecr create-repository --repository-name ${NAME} --image-scanning-configuration scanOnPush=true"
                                 sh "aws ecr get-login-password \
                                 | docker login \
